@@ -10,8 +10,8 @@ if agent2_int == mod(agent1_int + 2, 3)
         r1 = -1;
         r2 = 1;
     else 
-        r1 = 0;
-        r2 = 0;
+        r1 = -0.5;
+        r2 = -0.5;
 end
 
 end
