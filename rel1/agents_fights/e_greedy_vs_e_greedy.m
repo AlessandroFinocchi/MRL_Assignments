@@ -4,93 +4,124 @@ clc
 
 rng(42) % set the random seed
 
-A = 3; % dimension action space
-epsilon = 0.2; % probability we take a random action
-lengthEpisode = 20000; % number of actions to take
-alpha = 1e-3;
+A = 5; % dimension action space
+epsilon = 0.05; % probability we take a random action
+lengthEpisode = 200; % number of actions to take
+alpha = 0.0125;
 
-Q1 = ones(A, 1); % estimate of the value of actions for agent 1
+Q1 = zeros(A, 1); % estimate of the value of actions for agent 1
 N1 = zeros(A, 1); % number of times we take each action for agent 1
 
-Q2 = ones(A, 1); % estimate of the value of actions for agent 2
+Q2 = zeros(A, 1); % estimate of the value of actions for agent 2
 N2 = zeros(A, 1); % number of times we take each action for agent 2
 
-% save history of Q and N
-historyQ1 = zeros(A, lengthEpisode);
-historyN1 = zeros(A, lengthEpisode);
-historyQ2 = zeros(A, lengthEpisode);
-historyN2 = zeros(A, lengthEpisode);
+W1 = 0; % win counter for agent 1
+W2 = 0; % win counter for agent 2
+WD = 0; % draws
 
-v = 0;
-V1 = 0;
-V2 = 0;
+B1 = 0; % best choice for agent 1
+B2 = 0; % best choice for agent 2
+
+% history of Q, N, W and B
+historyQ1 = zeros(A, lengthEpisode); % for agent 1
+historyN1 = zeros(A, lengthEpisode);
+historyW1 = zeros(1, lengthEpisode);
+historyB1 = zeros(1, lengthEpisode);
+historyQ2 = zeros(A, lengthEpisode); % for agent 2
+historyN2 = zeros(A, lengthEpisode);
+historyW2 = zeros(1, lengthEpisode);
+historyB2 = zeros(1, lengthEpisode);
+historyWD = zeros(1, lengthEpisode); % for draws
 
 for i = 1:lengthEpisode
 
     % Agent 1 chooses action
     if rand < epsilon
-        % we take a random action
-        agent1_int = randi(A); 
+        agent1_int = randi(A); % we take a random action
     else
-        % we take the greedy action
-        agent1_int = find(Q1 == max(Q1));
-        agent1_int = agent1_int(randi(length(agent1_int))); % parity broken by random
+        agent1_int = find(Q1 == max(Q1), 1, 'first'); % we take the greedy action
     end
 
      % Agent 2 chooses action
     if rand < epsilon
-        % we take a random action
-        agent2_int = randi(A); 
+        agent2_int = randi(A); % we take a random action
     else
-        % we take the greedy action
-        agent2_int = find(Q2 == max(Q2));
-        agent2_int = agent2_int(randi(length(agent2_int))); % parity broken by random
+        agent2_int = find(Q2 == max(Q2), 1, 'first'); % we take the greedy action
     end
 
-    [r1, r2] = bandit_fight(agent1_int, agent2_int); % compute reward
+    % update B
+    B1 = find(Q1 == max(Q1), 1, 'first');
+    B2 = find(Q2 == max(Q2), 1, 'first');
 
-    if i == 1
-        if r1 == 1
-            v = 1;
-        elseif r1 == -1
-            v = 2;
-        end
-    end
-
-    if r1 == 1
-        V1 = V1 + 1;
-    elseif r1 == -1
-        V2 = V2 + 1;
-    end
+    % compute reward
+    [r1, r2] = bandit_fight(agent1_int, agent2_int); 
 
     % update N and Q
     N1(agent1_int) = N1(agent1_int) + 1;
-    Q1(agent1_int) = Q1(agent1_int) + 1/N1(agent1_int)*(r1 - Q1(agent1_int));
-    % Q1(agent1_int) = Q1(agent1_int) + alpha*(r1 - Q1(agent1_int));
+    % Q1(agent1_int) = Q1(agent1_int) + 1/N1(agent1_int)*(r1 - Q1(agent1_int));
+    Q1(agent1_int) = Q1(agent1_int) + alpha*(r1 - Q1(agent1_int));
 
     N2(agent2_int) = N2(agent2_int) + 1;
-    Q2(agent2_int) = Q2(agent2_int) + 1/N2(agent2_int)*(r2 - Q2(agent2_int));
-    % Q2(agent2_int) = Q2(agent2_int) + alpha*(r2 - Q2(agent2_int));
+    % Q2(agent2_int) = Q2(agent2_int) + 1/N2(agent2_int)*(r2 - Q2(agent2_int));
+    Q2(agent2_int) = Q2(agent2_int) + alpha*(r2 - Q2(agent2_int));
 
+    % update W
+    if r1 == 1
+        W1 = W1 + 1;
+    elseif r1 == -1
+        W2 = W2 + 1;
+    else
+        WD = WD + 1;
+    end
 
     % save the history
-    historyQ1(:,i) = Q1;
+    historyQ1(: ,i) = Q1; % for agent 1
     historyN1(:, i) = N1;
-    historyQ2(:,i) = Q2;
+    historyW1(:, i) = W1;
+    historyB1(:, i) = B1;
+    historyQ2(:, i) = Q2; % for agent 2
     historyN2(:, i) = N2;
+    historyW2(:, i) = W2;
+    historyB2(:, i) = B2;
+    historyWD(:, i) = WD; % for draws
+
 end
 
 %% plots
 
+% plot the history of Q
+figure()
+hold on
+plot(historyQ1', 'LineWidth', 2)
+plot(historyQ2', 'LineWidth', 2, 'LineStyle','--')
+hold off
+legend('Rock_1', 'Paper_1', 'Scissors_1', 'Spock_1', 'Lizard_1', 'Rock_2', 'Paper_2', 'Scissors_2', 'Spock_2', 'Lizard_2')
+title('Q')
 
 % plot the history of N
 figure()
-plot([historyQ1', historyQ2'], 'LineWidth', 2)
-legend('Rock1', 'Paper1', 'Scissors1', 'Rock2', 'Paper2', 'Scissors2')
-title('DIO')
+hold on
+plot(historyN1', 'LineWidth', 2)
+plot(historyN2', 'LineWidth', 2, 'LineStyle','--')
+hold off
+legend('Rock_1', 'Paper_1', 'Scissors_1', 'Spock_1', 'Lizard_1', 'Rock_2', 'Paper_2', 'Scissors_2', 'Spock_2', 'Lizard_2')
+title('N')
 
-v
-V1
-V2
+% plot the history of V
+figure()
+hold on
+plot(historyW1', 'LineWidth', 2)
+plot(historyW2', 'LineWidth', 2, 'LineStyle','--')
+plot(historyWD', 'LineWidth', 2, 'LineStyle',':')
+hold off
+legend('W_1', 'W_2', 'W_D')
+title('W')
 
-% convergence of Q for number of episodes tending to infinity
+% plot the history of B
+figure()
+hold on
+stairs(historyB1', 'LineWidth', 2)
+stairs(historyB2', 'LineWidth', 2, 'LineStyle','--')
+hold off
+legend('B_1', 'B_2')
+title('B')
