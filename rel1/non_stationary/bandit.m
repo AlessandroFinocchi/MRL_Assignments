@@ -1,20 +1,24 @@
-function [q,r] = bandit(q,agent_int)
+function [r] = bandit(agent_int, episodes, current_episode)
 % non stationary case 
 
-bandit_int = randi(5) - 1;
+action_space = 0:4;
+agent_int = agent_int-1;
 
-i1 = mod(bandit_int + 2, 5) + 1;
-i2 = mod(bandit_int + 4, 5) + 1;
-i3 = mod(bandit_int + 1, 5) + 1;
-i4 = mod(bandit_int + 3, 5) + 1;
+% Rock probability varies from 0,1 to 0,6 linearly
+% Lizard probability varies from 0,6 to 0,1 linearly
+% Other probabilities are constant
+c = current_episode/episodes;
+prob = [0.1 + c * 0.5, 0.1, 0.1, 0.1, 0.6 - c * 0.5];
 
-% Update q with the bandit draw
-q(i1) = q(i1) + 1;
-q(i2) = q(i2) + 1;
-q(i3) = q(i3) - 1;
-q(i4) = q(i4) - 1;
+% Bandit chooses an action with probabilities like in prob
+bandit_int = randsample(action_space, 1, true, prob);
 
-r = q(agent_int) + randn;
+    if bandit_int == mod(agent_int + 2, 5) || bandit_int == mod(agent_int + 4, 5)
+        r = 1;
+    elseif bandit_int == mod(agent_int + 1, 5) || bandit_int == mod(agent_int + 3, 5)
+        r = -1;
+    else 
+        r = 0;
+    end
 
 end
-
