@@ -79,6 +79,7 @@ for i = 1:lengthEpisode
     historyW1(:, i) = W1;
     historyW2(:, i) = W2;
     historyWD(:, i) = WD; % for draws
+    
 end
 
 %% plots
