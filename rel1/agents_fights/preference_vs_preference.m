@@ -9,8 +9,6 @@ A = 5; % dimension action space
 alpha = 1e-2; % update step for preferences
 beta = 1e-1; % update step for rewards
 lengthEpisode = 20000; % number of actions to take
-W1 = 0; % win counter for agent 1
-W2 = 0; % win counter for agent 2
 WD = 0; % draws
 historyWD = zeros(1, lengthEpisode);
 
@@ -20,13 +18,14 @@ H1 = zeros(A, 1); % preferences of actions
 avg_r1 = 0; % initialization of average reward 
 historyH1 = zeros(A, lengthEpisode); % save history of H
 historyW1 = zeros(1, lengthEpisode);
-
+W1 = 0; % win counter for agent 1
 
 %-------Initializzation for the second agent--------------------------
 H2 = zeros(A, 1); % preferences of actions
 avg_r2 = 0; % initialization of average reward 
 historyH2 = zeros(A, lengthEpisode); % save history of H
 historyW2 = zeros(1, lengthEpisode);
+W2 = 0; % win counter for agent 2
 
 
 for i = 1:lengthEpisode
