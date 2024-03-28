@@ -77,12 +77,40 @@ end
 
 %% plots
 
-figure()
+%-----------------plot the history of W------------------------------------
+% Fixed
+figure('Position', [0 0 1280 720])
 hold on
-plot(historyW(1,:)', 'LineWidth', 2)
-plot(historyW(2,:)', 'LineWidth', 2, 'LineStyle','--')
-plot(historyW(3,:)', 'LineWidth', 2, 'LineStyle',':')
-hold off
-legend('W_1', 'W_2', 'W_D')
+% Graph content
 title('W')
+plot(historyW(1,:)', 'LineWidth', 1.5)
+plot(historyW(2,:)', 'LineWidth', 1.5, 'LineStyle','--')
+plot(historyW(3,:)', 'LineWidth', 1.5, 'LineStyle',':')
+lgn = legend('Wins_1', 'Wins_2', 'Draws');
+set(gca, 'ColorOrder', colors(3))
+% Fixed
+grid on
+lgn.Location = 'northeastoutside';
+hold off
+% Save
+saveas(gcf, "graphs/e_vs_p/W", "png")
+%--------------------------------------------------------------------------
 
+%-----------------plot the history of H------------------------------------
+% Fixed
+figure('Position', [0 0 1280 720])
+hold on
+% Graph content
+title('H')
+plot(historyH2', 'LineWidth', 1.5)
+lgn = legend('Rock_2', 'Paper_2', 'Scissors_2', 'Spock_2', 'Lizard_2');
+set(gca, 'ColorOrder', colors(5))
+% Fixed
+grid on
+lgn.Location = 'northeastoutside';
+hold off
+% Save
+saveas(gcf, "graphs/e_vs_p/H", "png")
+%--------------------------------------------------------------------------
+
+close all

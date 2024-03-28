@@ -6,7 +6,7 @@ rng(42) % set the random seed
 
 A = 5; % dimension action space
 epsilon = 0.05; % probability we take a random action
-lengthEpisode = 200; % number of actions to take
+lengthEpisode = 2.5e2; % number of actions to take
 alpha = 0.0125;
 
 Q1 = zeros(A, 1); % estimate of the value of actions for agent 1
@@ -15,23 +15,19 @@ N1 = zeros(A, 1); % number of times we take each action for agent 1
 Q2 = zeros(A, 1); % estimate of the value of actions for agent 2
 N2 = zeros(A, 1); % number of times we take each action for agent 2
 
-W1 = 0; % win counter for agent 1
-W2 = 0; % win counter for agent 2
-WD = 0; % draws
-
 B1 = 0; % best choice for agent 1
 B2 = 0; % best choice for agent 2
 
-% history of Q, N, W and B
+% history of Q, N and B
 historyQ1 = zeros(A, lengthEpisode); % for agent 1
 historyN1 = zeros(A, lengthEpisode);
-historyW1 = zeros(1, lengthEpisode);
 historyB1 = zeros(1, lengthEpisode);
 historyQ2 = zeros(A, lengthEpisode); % for agent 2
 historyN2 = zeros(A, lengthEpisode);
-historyW2 = zeros(1, lengthEpisode);
 historyB2 = zeros(1, lengthEpisode);
-historyWD = zeros(1, lengthEpisode); % for draws
+
+historyW = zeros(3, lengthEpisode); % history of match result
+W = [0,0,0]; % counter for [agent 1 win, agent 2 win, draws]
 
 for i = 1:lengthEpisode
 
@@ -65,63 +61,81 @@ for i = 1:lengthEpisode
     % Q2(agent2_int) = Q2(agent2_int) + 1/N2(agent2_int)*(r2 - Q2(agent2_int));
     Q2(agent2_int) = Q2(agent2_int) + alpha*(r2 - Q2(agent2_int));
 
-    % update W
+    % ---------Update match result history---------------------
     if r1 == 1
-        W1 = W1 + 1;
+        W = W + [1, 0, 0];
     elseif r1 == -1
-        W2 = W2 + 1;
+        W = W + [0, 1, 0];
     else
-        WD = WD + 1;
+        W = W + [0, 0, 1];
     end
+    historyW(:,i) = W;
+    %-------------------------------------------------
 
     % save the history
     historyQ1(: ,i) = Q1; % for agent 1
     historyN1(:, i) = N1;
-    historyW1(:, i) = W1;
-    historyB1(:, i) = B1;
     historyQ2(:, i) = Q2; % for agent 2
     historyN2(:, i) = N2;
-    historyW2(:, i) = W2;
-    historyB2(:, i) = B2;
-    historyWD(:, i) = WD; % for draws
 
 end
 
-%% plots
+%% Graphs
 
-% plot the history of Q
-figure()
+%-----------------plot the history of Q----------------------------------
+% Fixed
+figure('Position', [0 0 1280 720])
 hold on
-plot(historyQ1', 'LineWidth', 2)
-plot(historyQ2', 'LineWidth', 2, 'LineStyle','--')
-hold off
-legend('Rock_1', 'Paper_1', 'Scissors_1', 'Spock_1', 'Lizard_1', 'Rock_2', 'Paper_2', 'Scissors_2', 'Spock_2', 'Lizard_2')
+% Graph content
 title('Q')
-
-% plot the history of N
-figure()
-hold on
-plot(historyN1', 'LineWidth', 2)
-plot(historyN2', 'LineWidth', 2, 'LineStyle','--')
+plot(historyQ1', 'LineWidth', 1.5)
+plot(historyQ2', 'LineWidth', 1.5, 'LineStyle','--')
+lgn = legend('Rock_1', 'Paper_1', 'Scissors_1', 'Spock_1', 'Lizard_1', 'Rock_2', 'Paper_2', 'Scissors_2', 'Spock_2', 'Lizard_2');
+set(gca, 'ColorOrder', colors(5))
+% Fixed
+grid on
+lgn.Location = 'northeastoutside';
 hold off
-legend('Rock_1', 'Paper_1', 'Scissors_1', 'Spock_1', 'Lizard_1', 'Rock_2', 'Paper_2', 'Scissors_2', 'Spock_2', 'Lizard_2')
+% Save graph
+saveas(gcf, "graphs/e_vs_e/Q", "png")
+%--------------------------------------------------------------------------
+
+%-----------------plot the history of V------------------------------------
+% Fixed
+figure('Position', [0 0 1280 720])
+hold on
+% Graph content
 title('N')
-
-% plot the history of V
-figure()
-hold on
-plot(historyW1', 'LineWidth', 2)
-plot(historyW2', 'LineWidth', 2, 'LineStyle','--')
-plot(historyWD', 'LineWidth', 2, 'LineStyle',':')
+plot(historyN1', 'LineWidth', 1.5)
+plot(historyN2', 'LineWidth', 1.5, 'LineStyle','--')
+lgn = legend('Rock_1', 'Paper_1', 'Scissors_1', 'Spock_1', 'Lizard_1', 'Rock_2', 'Paper_2', 'Scissors_2', 'Spock_2', 'Lizard_2');
+set(gca, 'ColorOrder', colors(5))
+% Fixed
+grid on
+lgn.Location = 'northeastoutside';
 hold off
-legend('W_1', 'W_2', 'W_D')
+% Save graph
+saveas(gcf, "graphs/e_vs_e/N", "png")
+%--------------------------------------------------------------------------
+
+
+%-----------------plot the history of W------------------------------------
+% Fixed
+figure('Position', [0 0 1280 720])
+hold on
+% Graph content
 title('W')
-
-% plot the history of B
-figure()
-hold on
-stairs(historyB1', 'LineWidth', 2)
-stairs(historyB2', 'LineWidth', 2, 'LineStyle','--')
+plot(historyW(1,:)', 'LineWidth', 1.5)
+plot(historyW(2,:)', 'LineWidth', 1.5, 'LineStyle','--')
+plot(historyW(3,:)', 'LineWidth', 1.5, 'LineStyle',':')
+lgn = legend('Wins_1', 'Wins_2', 'Draws');
+set(gca, 'ColorOrder', colors(3))
+% Fixed
+grid on
+lgn.Location = 'northeastoutside';
 hold off
-legend('B_1', 'B_2')
-title('B')
+% Save
+saveas(gcf, "graphs/e_vs_e/W", "png")
+%--------------------------------------------------------------------------
+
+close all
