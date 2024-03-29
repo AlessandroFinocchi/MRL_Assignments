@@ -8,20 +8,14 @@ A = 5; % dimension action space
 alpha = 1e-2; % update step for preferences
 beta = 1e-1; % update step for rewards
 lengthEpisode = 20000; % number of actions to take
-WW = 0; % counter for wins
-WS = 0; % counter for defeats
-WD = 0; % counter for draws
+W = [0,0,0]; % counter for [agent 1 win, agent 2 win, draws]
 
 H = zeros(A, 1); % preferences of actions
 avg_r = 0; % initialization of average reward
 
-% save history of H
+% save history of H and W
 historyH = zeros(A, lengthEpisode);
-
-% save history for W
-historyWW = zeros(1, lengthEpisode);
-historyWS = zeros(1, lengthEpisode);
-historyWD = zeros(1, lengthEpisode);
+historyW = zeros(3, lengthEpisode);
 
 for i = 1:lengthEpisode
     Proba = exp(H)/sum(exp(H));
@@ -34,37 +28,54 @@ for i = 1:lengthEpisode
     H(nota) = H(nota) - alpha*(r - avg_r)*Proba(nota);
     avg_r = avg_r + beta*(r-avg_r); % constant step for averagin rewards
 
-    % save the history
-    historyH(:,i) = H;
-
-    % update W
+    % ---------Update match result history---------------------
     if r == 1
-        WW = WW +1;
+        W = W + [1, 0, 0];
     elseif r == -1
-        WS = WS + 1;
+        W = W + [0, 1, 0];
     else
-        WD = WD + 1;
+        W = W + [0, 0, 1];
     end
 
-    % save the history for W 
-    historyWW(:, i) = WW;
-    historyWS(:, i) = WS;
-    historyWD(:, i) = WD; % for draws
+    % save the history for H and W
+    historyH(:,i) = H;
+    historyW(:,i) = W;
+
 end
 
 %% plots
 
-% plot the history of H
-figure()
-plot(historyH','LineWidth',2)
-ylabel('H')
-legend('Rock', 'Paper', 'Scissors', 'Spock', 'Lizard')
-
-figure()
+%-----------------plot the history of Q------------------------------------
+% Fixed
+figure('Position', [0 0 1280 720])
 hold on
-plot(historyWW', 'LineWidth', 2)
-plot(historyWS', 'LineWidth', 2, 'LineStyle','--')
-plot(historyWD', 'LineWidth', 2, 'LineStyle',':')
+% Graph content
+title('H')
+plot(historyH', 'LineWidth', 1.5)
+lgn = legend('Rock', 'Paper', 'Scissors', 'Spock', 'Lizard');
+set(gca, 'ColorOrder', colors(5))
+% Fixed
+grid on
+lgn.Location = 'northeastoutside';
 hold off
-legend('W_W', 'W_S', 'W_D')
+% Save graph
+saveas(gcf, "graphs/preference_update/Q", "png")
+%--------------------------------------------------------------------------
+
+%-----------------plot the history of W------------------------------------
+% Fixed
+figure('Position', [0 0 1280 720])
+hold on
+% Graph content
 title('W')
+plot(historyW(1,:)', 'LineWidth', 1.5)
+plot(historyW(2,:)', 'LineWidth', 1.5, 'LineStyle','--')
+plot(historyW(3,:)', 'LineWidth', 1.5, 'LineStyle',':')
+lgn = legend('Wins_{agent}', 'Wins_{bandit}', 'Draws');
+set(gca, 'ColorOrder', colors(3))
+% Fixed
+grid on
+lgn.Location = 'northeastoutside';
+hold off
+% Save
+saveas(gcf, "graphs/preference_update/W", "png")
