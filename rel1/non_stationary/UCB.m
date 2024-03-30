@@ -5,7 +5,7 @@ clc
 rng(401) % set the random seed
 A = 5; % dimension action space
 c = 10; % exploration rate
-lengthEpisode = 20000; % number of actions to take
+lengthEpisode = 40000; % number of actions to take
 alpha = 5e-2; % step size
 
 Q = ones(A, 1); % estimate of the value of actions
@@ -17,7 +17,6 @@ historyN = zeros(A, lengthEpisode);
 
 for i = 1:lengthEpisode
     Qext = Q + c*sqrt(log(i)./(N+1)); % extended value function
-
     % we choose the action that maximized the Qext
     agent_int = find(Qext == max(Qext)); 
     agent_int = agent_int(randi(length(agent_int))); % parity broken by random
@@ -37,11 +36,11 @@ end
 %% plots
 
 % plot the history of Q
-figure()
+figure('Position', [0 50 560 420])
 plot(historyQ','LineWidth',2)
 legend('Rock', 'Paper', 'Scissors', 'Spock', 'Lizard')
 
 % plot the history of N
-figure()
+figure('Position', [560 50 560 420])
 plot(historyN','LineWidth',2)
 legend('Rock', 'Paper', 'Scissors', 'Spock', 'Lizard')
