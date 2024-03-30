@@ -5,9 +5,9 @@ clc
 rng(42) % set the random seed
 
 A = 5; % dimension action space
-alpha = 1e-1; % update step for preferences
-beta = 1e-3; % update step for rewards
-lengthEpisode = 1e4; % number of actions to take
+alpha = 4e-5; % update step for preferences
+beta = 1e-2; % update step for rewards
+lengthEpisode = 1e5; % number of actions to take
 
 H = zeros(A, 1); % preferences of actions
 N = zeros(A, 1); % number of times we take each action
@@ -44,11 +44,11 @@ end
 %% plots
 
 % plot the history of Q
-figure()
+figure('Position', [0 50 560 420])
 plot(historyH','LineWidth',2)
 legend('Rock', 'Paper', 'Scissors', 'Spock', 'Lizard')
 
 % plot the history of N
-figure()
+figure('Position', [560 50 560 420])
 plot(historyN','LineWidth',2)
 legend('Rock', 'Paper', 'Scissors', 'Spock', 'Lizard')

@@ -41,12 +41,12 @@ end
 %% plots
 
 % plot the history of Q
-figure()
+figure('Position', [0 0 560 420])
 plot(historyQ', 'LineWidth',2)
 legend('Rock', 'Paper', 'Scissors', 'Spock', 'Lizard')
 
 % plot the history of N
-figure()
+figure('Position', [560 0 560 420])
 plot(historyN', 'LineWidth', 2)
 legend('Rock', 'Paper', 'Scissors', 'Spock', 'Lizard')
 
