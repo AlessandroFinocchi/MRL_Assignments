@@ -58,7 +58,7 @@ for i = 1:lengthEpisode
     H2(notagent_int2) = H2(notagent_int2) - alpha*(r2 - avg_r2)*Proba2(notagent_int2);
     avg_r2 = avg_r2 + beta*(r2-avg_r2); % update average reward with fixed step
 
-    % save the history for the first agent
+    % save the history for the second agent
     historyH2(:,i) = H2;
 
     % ---------Update match result history---------------------
