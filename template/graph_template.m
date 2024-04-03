@@ -4,8 +4,10 @@ clc
 
 lengthEpisode = 1e3;
 
+% ----------Setup match result history-----------------
 historyW = zeros(3, lengthEpisode);     % history of match result
 W = [0,0,0];                            % counter for [agent 1 win, agent 2 win, draws]
+% -----------------------------------------------------
 
 for i = 1:lengthEpisode
    
