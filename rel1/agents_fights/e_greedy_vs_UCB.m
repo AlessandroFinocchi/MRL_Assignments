@@ -20,7 +20,7 @@ historyQ1 = zeros(A, lengthEpisode); % save history of Q
 historyN1 = zeros(A, lengthEpisode); % save history of N
 
 %--------------Initialization for the e-greedy agent--------------
-epsilon2 = 0.05;
+epsilon2 = 5e-1;
 alpha2 = 1e-2; % step size
 Q2 = zeros(A, 1); % estimate of the value of actions for agent 1
 N2 = zeros(A, 1); % number of times we take each action for agent 1
@@ -46,10 +46,10 @@ for i = 1:lengthEpisode
 
     %---------------update N and Q for the UCB agent---------------------
     N1(agent_int1) = N1(agent_int1) + 1;
-    Q1(agent_int1) = Q1(agent_int1) + 1/N1(agent_int1)*(r1 - Q1(agent_int1));
+    Q1(agent_int1) = Q1(agent_int1) + alpha1*(r1 - Q1(agent_int1));
 
    
-    %---------Update preferences for the preference update agent---------
+    %---------Update preferences for the e-greedy update agent----------
     N2(agent_int2) = N2(agent_int2) + 1;
     Q2(agent_int2) = Q2(agent_int2) + alpha2*(r2 - Q2(agent_int2));
 
