@@ -6,7 +6,7 @@ rng(42) % set the random seed
 
 A = 5; % dimension action space
 alpha = 1e-2; % update step for preferences
-beta = 1e-1; % update step for rewards
+beta = 2e-2; % update step for rewards
 lengthEpisode = 20000; % number of actions to take
 
 H = zeros(A, 1); % preferences of actions
