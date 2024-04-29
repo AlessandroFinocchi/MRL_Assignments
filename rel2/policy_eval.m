@@ -13,4 +13,4 @@ end
 
 % solve directly the Bellman equation
 vpi = (eye(S) - gamma*Ppi)\Rpi;
-% inv(eye(S) - gamma*Ppi)*Rpi
+% vpi = inv(eye(S) - gamma*Ppi)*Rpi;

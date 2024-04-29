@@ -3,7 +3,7 @@ close all
 clc
 
 rng(1)
-load jac_car_rental_model.mat
+load gambler_model.mat
 gamma = 0.9;
 
 policy = randi(A, [S, 1]);
@@ -21,8 +21,8 @@ vpi = zeros(S,1);
 % tic
 while true
     % policy evaluation step
-    % vpi = policy_eval(S,P,R,policy,gamma);
-    vpi = iterative_policy_eval(S,P,R,policy,gamma,vpi);
+    vpi = policy_eval(S,P,R,policy,gamma);
+    % vpi = iterative_policy_eval(S,P,R,policy,gamma,vpi);
     % quality function
     qpi = zeros(S,A);
     % new policy
