@@ -2,7 +2,7 @@ function vpi = iterative_policy_evaluation(S,P,R,policy,gamma,vpi0)
 % computes the value function of policy pi by iterative policy evaluation
 
 % set tolerance
-toll = 1;
+toll = 1e-3;
 
 % transition probability matrix
 Ppi = zeros(S,S);

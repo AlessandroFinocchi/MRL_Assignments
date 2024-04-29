@@ -2,7 +2,7 @@ clear all
 close all
 clc
 
-maxMoney = 9; % money to reach
+maxMoney = 100; % money to reach
 
 S = maxMoney + 1; % number of possible states
 A = maxMoney - 1; % number of possible actions

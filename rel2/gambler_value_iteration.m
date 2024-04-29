@@ -5,7 +5,7 @@ clc
 rng(42)
 load gambler_model.mat
 gamma = 1;
-toll = 1e0;
+toll = 1e-3;
 
 vpi = zeros(S,1);
 while true
@@ -19,3 +19,10 @@ while true
         vpi = vpin;
     end
 end
+
+%% plots
+stem(policy)
+xlim([1, S]);
+ylim([0, A]);
+xlabel('States');
+ylabel('Actions');
