@@ -3,11 +3,12 @@ close all
 clc
 
 A = simple_track(30, 20);
+temp = A;
 
-x = 15;
-y = 1;
+row = 15;
+col = 14;
+temp(row,col) = 5;
 
-[xp, yp, vxp, vyp, r]=car(A, x,y,1,1,0,0);
-
-disp(xp)
-disp(yp)
+[row_new, col_new, v_row_new, v_col_new, r]=car(A, row, col,1,1,0,0);
+temp(row_new,col_new) = 6;
+heatmap(temp)
