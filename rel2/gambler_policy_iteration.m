@@ -5,7 +5,7 @@ clc
 rng(42)
 load gambler_model.mat
 gamma = 1;
-toll = 1e-3;
+toll = 1e-4;
 
 policy = randi(A, [S, 1]);
 
@@ -65,3 +65,10 @@ default_xticklabels = xticklabels;
 default_xticklabels{1} = "Loss";
 default_xticklabels{S} = "Win";
 xticklabels(default_xticklabels); % Set the labels for the ticks
+
+%%
+stem(vpi)
+xlim([-1, S+1]);
+ylim([-1.5, 1.5]);
+xlabel('States');
+ylabel('Actions');
