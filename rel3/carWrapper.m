@@ -1,4 +1,4 @@
-function [sp, r] = carWrapper(track, s, a)
+function [sp, r] = carWrapper(track, W, H, s, a)
     speedCap = 5;
     % unpack action to acceleration
     [a_row, a_col] = ind2sub([3,3], a);
@@ -11,11 +11,15 @@ function [sp, r] = carWrapper(track, s, a)
     v_row = v_row - speedCap - 1;
     v_col = v_col - speedCap - 1;
     % call car function
-    [row_new, col_new, v_row_new, v_col_new, r]=car(track, row, col, v_row, v_col, a_row, a_col);
+    [row_new, col_new, v_row_new, v_col_new, r] = car(track, W, H, speedCap, row, col, v_row, v_col, a_row, a_col);
     %traslate forward speed
     v_row_new = v_row_new + speedCap + 1;
     v_col_new = v_col_new + speedCap + 1;
     % pack state
-    sp = sub2ind([W, H, speedCap*2+1, speedCap*2+1], row_new, col_new, v_row_new, v_col_new);
+    if row_new == -1 && col_new == -1 
+        sp = -1; 
+    else
+        sp = sub2ind([W, H, speedCap*2+1, speedCap*2+1], row_new, col_new, v_row_new, v_col_new);
+    end
 end
 

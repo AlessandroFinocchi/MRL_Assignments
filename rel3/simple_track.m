@@ -1,6 +1,6 @@
 function [Ap] = simple_track(H, W)
-    hBound = 15; % wall height 
-    wBound = 15; % wall width
+    hBound = 3; % wall height 
+    wBound = 3; % wall width
     Ap = ones(H, W);
 
     % the outside
