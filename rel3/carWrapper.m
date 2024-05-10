@@ -1,5 +1,4 @@
-function [sp, r] = carWrapper(track, W, H, s, a)
-    speedCap = 5;
+function [sp, r] = carWrapper(track, W, H, speedCap, s, a)
     % unpack action to acceleration
     [a_row, a_col] = ind2sub([3,3], a);
     % traslate back acceleration

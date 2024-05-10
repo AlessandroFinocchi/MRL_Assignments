@@ -8,22 +8,23 @@ rng(42)
 W = 10;
 H = 5;
 track = simple_track(W, H);
-speedCap = 5;
+speedCap = 1;
+max_steps = 1000; % max number of steps for each episodes
 
 gamma = 1; % discount factor;
 numEpisodes = 1e2; % number of episodes to mean
 
 S = W*H*(speedCap*2+1)^2; % total number of states;
-A = 3*3; %hit or stick
+A = 3*3; % number of action
 
 policy = randi(A,[S,1]); % policy
-
+Q = zeros(S, A); % quality function
 while true
-    Q = zeros(S, A); % quality function
     N = zeros(S, A); % counter of visits
     for j = 1:numEpisodes
         fprintf("start %d\n",  j)
         % beginning of episode
+        % exploring start
         s0 = randi(S);
         a0 = randi(A);
         states = s0;
@@ -32,7 +33,9 @@ while true
         s = s0;
         a = a0;
         sp = s0;
-        while sp ~= -1 && length(rewards) < 1000
+        step_counter = 0; % count the number of the step to avoid cycling paths
+        while sp ~= -1 && step_counter < max_steps
+            step_counter = step_counter + 1;
             [a_row, a_col] = ind2sub([3,3], a);
             % traslate back acceleration
             a_col = a_col - 2;
@@ -43,10 +46,10 @@ while true
             if j == 3
                 % pause(1);
             end
-            % fprintf("row %d, col %d v_row %d v_col %d a_row %d a_col %d \n", row, col, v_row, v_col, a_row, a_col)
-            [sp,r] = carWrapper(track, W, H, s,a);
+            fprintf("row %d, col %d v_row %d v_col %d a_row %d a_col %d sc %d \n", row, col, v_row, v_col, a_row, a_col, step_counter)
+            [sp,r] = carWrapper(track, W, H, speedCap, s, a);
             rewards = [rewards, r];
-            if sp ~= -1 
+            if sp ~= -1 && step_counter < max_steps
                 states = [states, sp];
                 a = policy(sp);
                 actions = [actions, a];
@@ -68,7 +71,9 @@ while true
     newpolicy = zeros(S,1);
     % update the policy as greedy w.r.t. Q
     for s = 1:S
-        newpolicy(s) = find(Q(s,:) == max(Q(s, :)), 1, 'first');
+        index = find(Q(s,:) == max(Q(s, :)));
+        newpolicy(s) = randi(length(index));
+        % newpolicy(s) = find(Q(s,:) == max(Q(s, :)), 1, 'last');
     end
     % if policy doesn't change stop
     if norm(newpolicy-policy,2) <= 2.5
