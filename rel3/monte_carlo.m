@@ -18,10 +18,15 @@ S = W*H*(speedCap*2+1)^2; % total number of states;
 A = 3*3; % number of action
 
 policy = randi(A,[S,1]); % policy
+
 Q = zeros(S, A); % quality function
+
 while true
+
     N = zeros(S, A); % counter of visits
+
     for j = 1:numEpisodes
+
         fprintf("start %d\n",  j)
         % beginning of episode
         % exploring start
@@ -34,6 +39,7 @@ while true
         a = a0;
         sp = s0;
         step_counter = 0; % count the number of the step to avoid cycling paths
+
         while sp ~= -1 && step_counter < max_steps
             step_counter = step_counter + 1;
             [a_row, a_col] = ind2sub([3,3], a);
@@ -43,10 +49,7 @@ while true
             [row, col, v_row, v_col] = ind2sub([W, H, speedCap*2+1, speedCap*2+1], sp);
             v_row = v_row - speedCap - 1;
             v_col = v_col - speedCap - 1;
-            if j == 3
-                % pause(1);
-            end
-            fprintf("row %d, col %d v_row %d v_col %d a_row %d a_col %d sc %d \n", row, col, v_row, v_col, a_row, a_col, step_counter)
+            % fprintf("row %d, col %d v_row %d v_col %d a_row %d a_col %d sc %d \n", row, col, v_row, v_col, a_row, a_col, step_counter)
             [sp,r] = carWrapper(track, W, H, speedCap, s, a);
             rewards = [rewards, r];
             if sp ~= -1 && step_counter < max_steps
@@ -58,6 +61,7 @@ while true
         end
 
         G = 0;
+
         for i = length(actions):-1:1 % explore the episode backwards
             G = gamma*G + rewards(i);
             St = states(i);
@@ -65,16 +69,17 @@ while true
             N(St, At) = N(St, At) + 1;
             Q(St, At) = Q(St, At) + 1/N(St, At)*(G - Q(St, At));
         end
-        % [c1,c2,ua] = ind2sub([C1,C2,UA], states)
-        % myHand = c1 + 11;
+
     end
-    newpolicy = zeros(S,1);
+
     % update the policy as greedy w.r.t. Q
+    newpolicy = zeros(S,1);
     for s = 1:S
         index = find(Q(s,:) == max(Q(s, :)));
         newpolicy(s) = randi(length(index));
         % newpolicy(s) = find(Q(s,:) == max(Q(s, :)), 1, 'last');
     end
+
     % if policy doesn't change stop
     if norm(newpolicy-policy,2) <= 2.5
         break
@@ -82,6 +87,7 @@ while true
         disp(norm(newpolicy-policy,2))
         policy = newpolicy;
     end
+    
 end
 
 %% graphics
