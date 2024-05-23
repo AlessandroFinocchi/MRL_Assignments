@@ -2,10 +2,10 @@ clear
 close all
 clc
 
-rng(42) % set the random seed
+rng(422) % set the random seed
 
 A = 5; % dimension action space
-epsilon = 0.1; % probability we take a random action
+epsilon = 1e-1; % probability we take a random action
 lengthEpisode = 20000; % number of actions to take
 
 Q = ones(A, 1); % estimate of the value of actions
@@ -18,8 +18,8 @@ historyN = zeros(A, lengthEpisode);
 % ----------Setup match result history-----------------
 historyW = zeros(3, lengthEpisode);     % history of match result
 W = [0,0,0];                            % counter for [agent 1 win, agent 2 win, draws]
-% -----------------------------------------------------
 
+% -----------------------------------------------------
 for i = 1:lengthEpisode
 
     if rand < epsilon
@@ -61,8 +61,9 @@ figure('Position', [0 0 1280 720])
 hold on
 % Graph content
 title('Q')
-plot(historyQ', 'LineWidth', 1.5)
+plot(historyQ', 'LineWidth', 3)
 lgn = legend('Rock', 'Paper', 'Scissors', 'Spock', 'Lizard');
+lgn.FontSize = 24;
 set(gca, 'ColorOrder', colors(5))
 % Fixed
 grid on
@@ -78,8 +79,9 @@ figure('Position', [0 0 1280 720])
 hold on
 % Graph content
 title('N')
-plot(historyN', 'LineWidth', 1.5)
+plot(historyN', 'LineWidth', 3)
 lgn = legend('Rock', 'Paper', 'Scissors', 'Spock', 'Lizard');
+lgn.FontSize = 24;
 set(gca, 'ColorOrder', colors(5))
 % Fixed
 grid on
@@ -95,10 +97,11 @@ figure('Position', [0 0 1280 720])
 hold on
 % Graph content
 title('W')
-plot(historyW(1,:)', 'LineWidth', 1.5)
-plot(historyW(2,:)', 'LineWidth', 1.5, 'LineStyle','--')
-plot(historyW(3,:)', 'LineWidth', 1.5, 'LineStyle',':')
+plot(historyW(1,:)', 'LineWidth', 3)
+plot(historyW(2,:)', 'LineWidth', 3, 'LineStyle','--')
+plot(historyW(3,:)', 'LineWidth', 3, 'LineStyle',':')
 lgn = legend('Wins_{agent}', 'Wins_{bandit}', 'Draws');
+lgn.FontSize = 24;
 set(gca, 'ColorOrder', colors(3))
 % Fixed
 grid on
