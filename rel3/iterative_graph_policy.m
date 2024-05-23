@@ -24,7 +24,7 @@ function [] = iterative_graph_policy(track, policy, W, H, speedCap, iteration)
     current_state = sub2ind([W, H, speedCap*2+1, speedCap*2+1], curr_row, curr_col, v_row, v_col);
 
     steps = 0;
-    maxSteps = 1000;
+    maxSteps = 10000;
 
     while current_state ~= -1
         next_action = policy(current_state);
@@ -32,7 +32,7 @@ function [] = iterative_graph_policy(track, policy, W, H, speedCap, iteration)
         actions = [actions, next_action];
         steps = steps + 1;
         if steps > maxSteps
-            return
+            disp(steps)
         end
 
         [a_row, a_col] = ind2sub([3,3], next_action);

@@ -1,9 +1,9 @@
-function [] = graph_policy(track, policy, W, H, speedCap, iteration)
+function [] = graph_policy(track, policy, H, W, speedCap, iteration)
 
     % initialize starting point
     starting_line = find(track(:,:) == 2);
     current_position = starting_line(randi(length(starting_line)));
-    [curr_row, curr_col] = ind2sub([W,H], current_position);
+    [curr_row, curr_col] = ind2sub([H, W], current_position);
     start_r = curr_row;
     start_c = curr_col;
 
@@ -21,7 +21,7 @@ function [] = graph_policy(track, policy, W, H, speedCap, iteration)
     a_cols = [];
     a_rows = [];
 
-    current_state = sub2ind([W, H, speedCap*2+1, speedCap*2+1], curr_row, curr_col, v_row, v_col);
+    current_state = sub2ind([H, W, speedCap*2+1, speedCap*2+1], curr_row, curr_col, v_row, v_col);
 
     steps = 0;
     maxSteps = 1000;
@@ -41,7 +41,7 @@ function [] = graph_policy(track, policy, W, H, speedCap, iteration)
         a_row = a_row -2;
         a_cols = [a_cols, a_col];
         a_rows = [a_rows, a_row];
-        [row, col, v_row, v_col] = ind2sub([W, H, speedCap*2+1, speedCap*2+1], current_state);
+        [row, col, v_row, v_col] = ind2sub([H, W, speedCap*2+1, speedCap*2+1], current_state);
         v_row = v_row - speedCap - 1;
         v_col = v_col - speedCap - 1;
         % fprintf("graph-policy:(row: %d, col: %d v_row: %d v_col: %d) <-> a:(a_row: %d, a_col: %d)\n", row, col, v_row, v_col, a_row, a_col);
@@ -50,12 +50,12 @@ function [] = graph_policy(track, policy, W, H, speedCap, iteration)
         v_rows = [v_rows, v_row];
         v_cols = [v_cols, v_col];
 
-        [current_state, ] = carWrapper(track, W, H, speedCap, current_state, next_action);
+        [current_state, ] = carWrapper(track, H, W, speedCap, current_state, next_action);
         
     end
 
-    last_row = max(min(row + v_row + a_row, W), 1);
-    last_col = max(min(col + v_col + a_col, H), 1);
+    last_row = max(min(row + v_row + a_row, H), 1);
+    last_col = max(min(col + v_col + a_col, W), 1);
     rows = [rows, last_row];
     cols = [cols, last_col];
     v_cols = [v_cols, 0];
@@ -83,14 +83,14 @@ function [] = graph_policy(track, policy, W, H, speedCap, iteration)
     % print holes 
     holes = find(track(:,:) == 0);
     for i = 1:length(holes)
-        [row, col] = ind2sub([W, H], holes(i));
+        [row, col] = ind2sub([H, W], holes(i));
         rectangle('Position',[col, row, 1 1],'FaceColor','black','EdgeColor','black');
     end
 
     % print starting line 
     holes = find(track(:,:) == 2);
     for i = 1:length(holes)
-        [row, col] = ind2sub([W, H], holes(i));
+        [row, col] = ind2sub([H, W], holes(i));
         rectangle('Position',[col, row, 1 1],'FaceColor','blue','EdgeColor','blue');
     end
 
@@ -100,7 +100,7 @@ function [] = graph_policy(track, policy, W, H, speedCap, iteration)
     % print finish line 
     holes = find(track(:,:) == 3);
     for i = 1:length(holes)
-        [row, col] = ind2sub([W, H], holes(i));
+        [row, col] = ind2sub([H, W], holes(i));
         rectangle('Position',[col, row, 1, 1],'FaceColor','green','EdgeColor','green');
     end
 

@@ -5,7 +5,7 @@ clc
 rng(42)
 
 % init track
-[track, H, W] = medium_track();
+[track, H, W] = hard_track_no_skip_big3();
 speedCap = 2;
 
 gamma = 1; % discount factor;
