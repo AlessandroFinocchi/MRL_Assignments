@@ -1,4 +1,6 @@
-function [Ap] = simple_track(H, W)
+function [Ap, H, W] = simple_track()
+    H = 10;
+    W = 10;
     hBound = 3; % wall height 
     wBound = 3; % wall width
     Ap = ones(H, W);
