@@ -6,7 +6,7 @@ rng(42)
 
 % init track
 W = 10;
-H = 5;
+H = 10;
 track = simple_track(W, H);
 speedCap = 2;
 
@@ -147,6 +147,8 @@ while true
 
 end
 
+    
+
 %% print policy
 
 for s=1:S
@@ -164,4 +166,5 @@ for s=1:S
 
 end
 
-
+%% graph policy
+graph_policy(track, policy, W, H, speedCap);
