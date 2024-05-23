@@ -67,7 +67,6 @@ function [] = iterative_graph_policy(track, policy, W, H, speedCap, iteration)
 
     % print map
     
-
     for j = 1:length(cols)
         figure(1)
         clf

@@ -5,8 +5,7 @@ clc
 rng(42)
 
 % init track
-[track, H, W] = empty_track_big6();
-heatmap(track);
+[track, H, W] = hard_track_no_skip_walled_big3();
 speedCap = 2;
 
 numEpisodes = 1;            % number of episodes
@@ -62,7 +61,7 @@ while true
 
             if (any(visitedQ == sub2ind([S,A], s, a))) || step_counter >= maxSteps
                 loopCounter = loopCounter + 1;
-                if loopCounter >= 2 || step_counter >= maxSteps
+                if loopCounter >= 5 || step_counter >= maxSteps
                     skippedEpisode = true;
                     break
                 end
