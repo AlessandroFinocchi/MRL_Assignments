@@ -5,13 +5,11 @@ clc
 rng(42)
 
 % init track
-W = 10;
-H = 10;
-track = simple_track(W, H);
+[track, H, W] = medium_track();
 speedCap = 2;
 
 gamma = 1; % discount factor;
-numEpisodes = 1000; % number of episodes to mean
+numEpisodes = 100; % number of episodes to mean
 epsilon = 0.5;
 
 S = W*H*(speedCap*2+1)^2; % total number of states;
@@ -35,6 +33,7 @@ while true
     iteration_counter = iteration_counter + 1;
 
     numEpisodes = min(1e4, numEpisodes * 1.10);
+    skipped = 0;
 
     for j = 1:numEpisodes
         
@@ -109,12 +108,13 @@ while true
             %     Q(St, At) = Q(St, At) + alpha*(G - Q(St, At));
             % end
 
-            if iteration_counter < 10
+            if true || iteration_counter < 30
                 fprintf("Episode %d.%d -> ", iteration_counter, j);
                 fprintf("took %d steps.\n", step_counter);
             end
         else
-            if iteration_counter < 10
+            if true || iteration_counter < 30
+                skipped = skipped + 1;
                 numEpisodes = numEpisodes + 1;
                 fprintf("Episode %d.%d -> ", iteration_counter, j);
                 fprintf("skipped.\n");
@@ -143,6 +143,8 @@ while true
         break
     else
         policy = newpolicy;
+        graph_policy(track, policy, W, H, speedCap);
+        % pause(1);
     end
 
 end
