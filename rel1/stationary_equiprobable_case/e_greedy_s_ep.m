@@ -5,9 +5,8 @@ clc
 rng(422) % set the random seed
 
 A = 5; % dimension action space
-epsilon = 3e-1; % probability we take a random action
-alpha = 5e-3;
-lengthEpisode = 100000; % number of actions to take
+epsilon = 1e-1; % probability we take a random action
+lengthEpisode = 20000; % number of actions to take
 
 Q = ones(A, 1); % estimate of the value of actions
 N = zeros(A, 1); % number of times we take each action
@@ -47,7 +46,7 @@ for i = 1:lengthEpisode
 
     % update N and Q
     N(agent_int) = N(agent_int) + 1;
-    Q(agent_int) = Q(agent_int) + alpha*(r - Q(agent_int));
+    Q(agent_int) = Q(agent_int) + 1/N(agent_int)*(r - Q(agent_int));
 
     % save the history
     historyQ(:,i) = Q;
