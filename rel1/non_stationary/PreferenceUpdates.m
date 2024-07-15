@@ -5,9 +5,10 @@ clc
 rng(42) % set the random seed
 
 A = 5; % dimension action space
-alpha = 4e-5; % update step for preferences
+alpha = 1e-2; % update step for preferences
 beta = 1e-2; % update step for rewards
-lengthEpisode = 1e5; % number of actions to take
+lengthEpisode = 20000; % number of actions to take
+W = [0,0,0]; % counter for [agent 1 win, agent 2 win, draws]
 
 H = zeros(A, 1); % preferences of actions
 N = zeros(A, 1); % number of times we take each action
@@ -16,6 +17,7 @@ avg_r = 0; % initialization of average reward
 % save history of H
 historyH = zeros(A, lengthEpisode);
 historyN = zeros(A, lengthEpisode);
+historyW = zeros(3, lengthEpisode);
 
 for i = 1:lengthEpisode
     Proba = exp(H)/sum(exp(H)); % Compute softmax for each action
@@ -36,19 +38,74 @@ for i = 1:lengthEpisode
 
     avg_r = avg_r + beta*(r-avg_r); % update average reward with fixed step
 
+    % ---------Update match result history---------------------
+    if r == 1
+        W = W + [1, 0, 0];
+    elseif r == -1
+        W = W + [0, 1, 0];
+    else
+        W = W + [0, 0, 1];
+    end
+
     % save the history
     historyH(:,i) = H;
     historyN(:, i) = N;
+    historyW(:,i) = W;
 end
 
 %% plots
 
-% plot the history of Q
-figure('Position', [0 50 560 420])
-plot(historyH','LineWidth',2)
-legend('Rock', 'Paper', 'Scissors', 'Spock', 'Lizard')
+%-----------------plot the history of Q------------------------------------
+% Fixed
+figure('Position', [0 0 1280 720])
+hold on
+% Graph content
+title('H')
+plot(historyH', 'LineWidth', 3)
+lgn = legend('Rock', 'Paper', 'Scissors', 'Spock', 'Lizard');
+lgn.FontSize = 24;
+set(gca, 'ColorOrder', colors(5))
+% Fixed
+grid on
+lgn.Location = 'northeastoutside';
+hold off
+% Save graph
+saveas(gcf, "graphs/preference_update/H", "png")
+%--------------------------------------------------------------------------
 
-% plot the history of N
-figure('Position', [560 50 560 420])
-plot(historyN','LineWidth',2)
-legend('Rock', 'Paper', 'Scissors', 'Spock', 'Lizard')
+%-----------------plot the history of V------------------------------------
+% Fixed
+figure('Position', [0 0 1280 720])
+hold on
+% Graph content
+title('N')
+plot(historyN', 'LineWidth', 3)
+lgn = legend('Rock', 'Paper', 'Scissors', 'Spock', 'Lizard');
+lgn.FontSize = 24;
+set(gca, 'ColorOrder', colors(5))
+% Fixed
+grid on
+lgn.Location = 'northeastoutside';
+hold off
+% Save graph
+saveas(gcf, "graphs/preference_update/N", "png")
+%--------------------------------------------------------------------------
+
+%-----------------plot the history of W------------------------------------
+% Fixed
+figure('Position', [0 0 1280 720])
+hold on
+% Graph content
+title('W')
+plot(historyW(1,:)', 'LineWidth', 3)
+plot(historyW(2,:)', 'LineWidth', 3, 'LineStyle','--')
+plot(historyW(3,:)', 'LineWidth', 3, 'LineStyle',':')
+lgn = legend('Wins_{agent}', 'Wins_{bandit}', 'Draws');
+lgn.FontSize = 24;
+set(gca, 'ColorOrder', colors(3))
+% Fixed
+grid on
+lgn.Location = 'northeastoutside';
+hold off
+% Save
+saveas(gcf, "graphs/preference_update/W", "png")
