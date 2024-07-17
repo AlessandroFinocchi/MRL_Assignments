@@ -1,38 +1,45 @@
-function [Ap, H, W] = medium_track()
+function [Ap, H, W] = empty_track_big6()
 
-    H = 2 * 5;
-    W = 2 * 5;
+    H = 6 * 5;
+    W = 6 * 5;
 
     Ap = ones(H, W);
     
-    for col = 3:4
-        for row = 1:8
+    for col = 1:1
+        for row = 1:H
             Ap(row, col) = 0;
         end
     end
 
-    for col = 7:8
-        for row = 10:10
+    for col = W:W
+        for row = 1:H
             Ap(row, col) = 0;
         end
     end
 
-    for col = 8:8
-        for row = 3:10
+    for col = 4:W
+        for row = 1:1
             Ap(row, col) = 0;
         end
     end
+
+    for col = 1:W-3
+        for row = H:H
+            Ap(row, col) = 0;
+        end
+    end
+
 
     % the starting line
-    for col = 1:2
+    for col = 2:W-1
         for row = 1:1
             Ap(row, col) = 2;
         end
     end
 
     % the finishing line
-    for col = 9:10
-        for row = 10:10
+    for col = W-2:W-1
+        for row = H:H
             Ap(row, col) = 3;
         end
     end

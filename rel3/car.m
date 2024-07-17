@@ -1,5 +1,5 @@
 function [row_new, col_new, v_row_new, v_col_new, r]=car( ...
-    track, W, H, speedCap, row, col, v_row, v_col, a_row, a_col)
+    track, H, W, speedCap, row, col, v_row, v_col, a_row, a_col)
     r = -1; % at each step the reward is -1
 
     % update speed
@@ -7,8 +7,8 @@ function [row_new, col_new, v_row_new, v_col_new, r]=car( ...
     v_col_new = max(min(v_col + a_col, speedCap),-speedCap);
 
     % update position
-    row_new = max(min(row+v_row_new, W), 1);
-    col_new = max(min(col+v_col_new, H), 1);
+    row_new = max(min(row+v_row_new, H), 1);
+    col_new = max(min(col+v_col_new, W), 1);
 
     % checks on the new position
     switch track(row_new, col_new)

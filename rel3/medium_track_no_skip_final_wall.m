@@ -1,4 +1,4 @@
-function [Ap, H, W] = medium_track()
+function [Ap, H, W] = medium_track_no_skip_final_wall()
 
     H = 2 * 5;
     W = 2 * 5;
@@ -12,12 +12,6 @@ function [Ap, H, W] = medium_track()
     end
 
     for col = 7:8
-        for row = 10:10
-            Ap(row, col) = 0;
-        end
-    end
-
-    for col = 8:8
         for row = 3:10
             Ap(row, col) = 0;
         end
@@ -32,9 +26,15 @@ function [Ap, H, W] = medium_track()
 
     % the finishing line
     for col = 9:10
-        for row = 10:10
+        for row = 9:9
             Ap(row, col) = 3;
         end
     end
+
+    % for col = 9:10
+    %     for row = 10:10
+    %         Ap(row, col) = 0;
+    %     end
+    % end
    
 end

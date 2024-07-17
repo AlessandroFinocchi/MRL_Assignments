@@ -5,43 +5,47 @@ clc
 rng(42)
 
 % init track
-W = 10;
-H = 5;
-track = simple_track(W, H);
+[track, H, W] = hard_track_no_skip_walled_big3();
 speedCap = 2;
 
-gamma = 1; % discount factor;
-numEpisodes = 1000; % number of episodes to mean
+numEpisodes = 1;            % number of episodes
+maxNumEpisodes = 50;
 
-S = W*H*(speedCap*2+1)^2; % total number of states;
-A = 3*3; % number of action
+S = W*H*(speedCap*2+1)^2;   % total number of states;
+A = 3*3;                    % number of action
 
-maxSteps = 10000;
+maxSteps = sqrt(S);
 
 policy = randi(A,[S,1]); % policy
 
 Q = ones(S, A) .* -maxSteps; % quality function
-alpha = 0.1;
-% N = zeros(S, A); % counter of visits
+alpha = 0.2;
+N = zeros(S, A);
 
 iteration_counter = 0;
+total_skipped_episodes = 0;
+total_valid_episodes = 0;
 
 while true
 
-    % Q = zeros(S, A); % quality function
-    % N = zeros(S, A); % counter of visits
-    
     iteration_counter = iteration_counter + 1;
+    skipped = 0;
+    j = 1;
 
-    numEpisodes = min(1e4, numEpisodes * 1.10);
+    while j <= numEpisodes
 
-    for j = 1:numEpisodes
+        unexploredStates = find(N(:,:) == 0);
+        if ~isempty(unexploredStates) && randi(1) < (sum(sum(any(N==0, [S,A]))) / (S*A))
+        % if ~isempty(unexploredStates) && randi(1) < (sum(sum(any(N==0, [S,A]))) / (S*A))^2
+        % if ~isempty(unexploredStates) && randi(1) < 0.9
+        % if ~isempty(unexploredStates) < 0.5
+            [s0, a0] = ind2sub([S,A], unexploredStates(randi(length(unexploredStates))));
+        else
+            s0 = randi(S);
+            a0 = randi(A);
+        end
         
         step_counter = 0;
-        % beginning of episode
-        % fprintf("Begin episode %d.%d -> ", iteration_counter, j);
-        s0 = randi(S);
-        a0 = randi(A);
         states = s0;
         actions = a0;
         rewards = [];
@@ -49,39 +53,36 @@ while true
         a = a0;
         sp = s0;
 
-        while sp ~= -1 && step_counter < maxSteps
-            
-            [a_row, a_col] = ind2sub([3,3], a);
-            % traslate back acceleration
-            a_col = a_col - 2;
-            a_row = a_row -2;
-            [row, col, v_row, v_col] = ind2sub([W, H, speedCap*2+1, speedCap*2+1], sp);
-            v_row = v_row - speedCap - 1;
-            v_col = v_col - speedCap - 1;
+        visitedQ = [];
+        loopCounter = 0;
+        skippedEpisode = false;
 
-            % if iteration_counter == 3 
-            %     fprintf("row %d, col %d v_row %d v_col %d a_row %d a_col %d\n", row, col, v_row, v_col, a_row, a_col);
-            %     pause(0.2);
-            % end
+        while sp ~= -1
 
-            [sp,r] = carWrapper(track, W, H, speedCap, s, a);
+            if (any(visitedQ == sub2ind([S,A], s, a))) || step_counter >= maxSteps
+                loopCounter = loopCounter + 1;
+                if loopCounter >= 5 || step_counter >= maxSteps
+                    skippedEpisode = true;
+                    break
+                end
+            else
+                visitedQ = [visitedQ, sub2ind([S,A], s, a)];
+            end
+
+            [sp,r] = carWrapper(track, H, W, speedCap, s, a);
             step_counter = step_counter + 1;
             rewards = [rewards, r];
 
             if sp ~= -1
                 states = [states, sp];
                 a = policy(sp);
-                if rand < epsilon
-                    a = randi(A);
-                end
                 actions = [actions, a];
                 s = sp;
             end
 
         end
 
-        if step_counter < (maxSteps - 1)
-
+        if ~skippedEpisode
             % First visit
             already_visited = [];
             for i = 1:length(actions)
@@ -94,73 +95,76 @@ while true
                     for k = i+1:length(rewards)
                         G = G + rewards(k);
                     end
-                    Q(St, At) = Q(St, At) + alpha*(G - Q(St, At));
+                    % Q(St, At) = Q(St, At) + alpha*(G - Q(St, At));
+                    N(St, At) = N(St, At) + 1;
+                    if N(St,At) == 1
+                        Q(St,At) = G;
+                    else
+                        Q(St, At) = Q(St, At) + alpha*(G - Q(St, At));
+                    end
                 end
             end
-
-            % Every visit
-            % G = 0;
-            % for i = length(actions):-1:1 % explore the episode backwards
-            %     G = gamma*G + rewards(i);
-            %     St = states(i);
-            %     At = actions(i);
-            % 
-            %     Q(St, At) = Q(St, At) + alpha*(G - Q(St, At));
-            % end
-
-            if iteration_counter < 10
-                fprintf("Episode %d.%d -> ", iteration_counter, j);
-                fprintf("took %d steps.\n", step_counter);
-            end
+            j = j + 1;
+            total_valid_episodes = total_valid_episodes + 1;
         else
-            if iteration_counter < 10
-                numEpisodes = numEpisodes + 1;
-                fprintf("Episode %d.%d -> ", iteration_counter, j);
-                fprintf("skipped.\n");
-            end
+            skipped = skipped + 1;
+            total_skipped_episodes = total_skipped_episodes + 1;
         end
 
     end
 
+    % update number of episodes
+    numEpisodes = min(maxNumEpisodes, max(floor(numEpisodes * 1.10), numEpisodes + 1));
+
     newpolicy = zeros(S,1);
     % update the policy as greedy w.r.t. Q
     for s = 1:S
-        % newpolicy(s) = find(Q(s,:) == max(Q(s, :)), 1, 'first');
-        % newpolicy(s) = find(Q(s,:) == max(Q(s, :)), 1, 'last');
         index = find(Q(s,:) == max(Q(s, :)));
         newpolicy(s) = index(randi(length(index)));
     end
 
-    % GLIE
-    epsilon = epsilon * 0.95;
-    epsilon = max(epsilon, 0.01);
-
-    % if policy doesn't change stop
     s = policy~=newpolicy;
-    fprintf("Policy changed at iteration %d: %.3f\n", iteration_counter, sum(s));
-    if sum(s) < length(policy) * 0.05
-        break
-    else
-        policy = newpolicy;
+
+    fprintf("Policy changed at iteration %d: %.3f.\n" +...
+        "After %d+%d episodes.\n" + ...
+        "After %d+%d total episodes.\n" + ...
+        "Mean exploration of Q  : %.2f\n" + ...
+        "Unexplored entries of Q: %d/%d, approx %.2f%%\n\n", ...
+        iteration_counter, sum(s), ...
+        numEpisodes, skipped, ...
+        total_valid_episodes, total_skipped_episodes, ...
+        mean(mean(N)), ...
+        sum(sum(any(N==0, [S,A]))), S*A, sum(sum(any(N==0, [S,A]))) / (S*A)*100);
+
+    policy = newpolicy;
+    graph_policy(track, policy, W, H, speedCap, iteration_counter);
+    % if policy doesn't change stop
+    % if sum(s) <= (S*A)*0.05 || (sum(sum(any(N==0, [S,A]))) / S*A) < 0.05
+    % if (sum(sum(any(N==0, [S,A]))) / (S*A)) < 0.05
+    if (sum(sum(any(N==0, [S,A]))) / (S*A)) < 0.10
+        break;
     end
+
+end
 
     
 
-end
-
 %% print policy
 
-for s=1:S
+% for s=1:S
+% 
+%     a = policy(s);
+% 
+%     [a_row, a_col] = ind2sub([3,3], a);
+%     % traslate back acceleration
+%     a_col = a_col - 2;
+%     a_row = a_row -2;
+%     [row, col, v_row, v_col] = ind2sub([W, H, speedCap*2+1, speedCap*2+1], s);
+%     v_row = v_row - speedCap - 1;
+%     v_col = v_col - speedCap - 1;
+%     fprintf("s:(row: %d, col: %d v_row: %d v_col: %d) <-> a:(a_row: %d, a_col: %d)\n", row, col, v_row, v_col, a_row, a_col);
+% 
+% end
 
-    a = policy(s);
-
-    [a_row, a_col] = ind2sub([3,3], a);
-    % traslate back acceleration
-    a_col = a_col - 2;
-    a_row = a_row -2;
-    [row, col, v_row, v_col] = ind2sub([W, H, speedCap*2+1, speedCap*2+1], s);
-    v_row = v_row - speedCap - 1;
-    v_col = v_col - speedCap - 1;
-    fprintf("s:(row: %d, col: %d v_row: %d v_col: %d) <-> a:(a_row: %d, a_col: %d)\n", row, col, v_row, v_col, a_row, a_col);
-
-end
+%% graph policy
+iterative_graph_policy(track, policy, W, H, speedCap, iteration_counter);
