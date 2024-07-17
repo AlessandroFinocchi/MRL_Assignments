@@ -46,7 +46,11 @@ for i = 1:lengthEpisode
 
     % update N and Q
     N(agent_int) = N(agent_int) + 1;
+<<<<<<< HEAD
     Q(agent_int) = Q(agent_int) + (1 / N(agent_int))*(r - Q(agent_int));
+=======
+    Q(agent_int) = Q(agent_int) + 1/N(agent_int)*(r - Q(agent_int));
+>>>>>>> origin/final
 
     % save the history
     historyQ(:,i) = Q;
