@@ -5,8 +5,8 @@ clc
 rng(42)
 
 % init track
-[track, H, W] = hard_track_no_skip_walled_big3();
-speedCap = 2;
+[track, H, W] = empty_track_big6();
+speedCap = 5;
 
 numEpisodes = 1;            % number of episodes
 maxNumEpisodes = 50;
@@ -125,7 +125,7 @@ while true
 
     s = policy~=newpolicy;
 
-    fprintf("Policy changed at iteration %d: %.3f.\n" +...
+    fprintf("Policy changed at iteration %d: %d.\n" +...
         "After %d+%d episodes.\n" + ...
         "After %d+%d total episodes.\n" + ...
         "Mean exploration of Q  : %.2f\n" + ...

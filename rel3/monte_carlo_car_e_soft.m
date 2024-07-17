@@ -5,8 +5,8 @@ clc
 rng(42)
 
 % init track
-[track, H, W] = hard_track_no_skip_big3();
-speedCap = 2;
+[track, H, W] = empty_track_big6();
+speedCap = 5;
 
 gamma = 1; % discount factor;
 numEpisodes = 100; % number of episodes to mean

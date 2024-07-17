@@ -75,7 +75,7 @@ function [] = graph_policy(track, policy, H, W, speedCap, iteration)
     set(gca,'ytick',1:H)
     % set(gca,'xticklabels',[])
     % set(gca,'yticklabels',[])
-    title(["Iteration: " iteration])
+    %title(["Iteration: " iteration])
     grid on
     box on
     hold on

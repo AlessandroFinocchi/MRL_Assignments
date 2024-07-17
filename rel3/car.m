@@ -17,6 +17,8 @@ function [row_new, col_new, v_row_new, v_col_new, r]=car( ...
             rand_index = randi(length(row0));
             row_new = row0(rand_index);
             col_new = col0(rand_index);
+            v_row_new = 0;
+            v_col_new = 0;
         case 3 % the car crossed the finishing line
            row_new = -1;
            col_new = -1;
