@@ -1,51 +1,47 @@
-function [Ap, H, W] = xxl_track()
+function [Ap, H, W] = track_empty_30()
 
-    H = 15;
-    W = 15;
+    H = 6 * 5;
+    W = 6 * 5;
 
     Ap = ones(H, W);
     
-    % center wall
-    for col = 6:10
-        for row = 1:11
-            Ap(row, col) = 0;
-        end
-    end
-
-    % left wall
     for col = 1:1
-        for row = 1:15
+        for row = 1:H
             Ap(row, col) = 0;
         end
     end
 
-    % top wall
-    for col = 1:15
-        for row = 15:15
+    for col = W:W
+        for row = 1:H
             Ap(row, col) = 0;
         end
     end
 
-    % right wall
-    for col = 15:15
-        for row = 1:15
+    for col = 4:W
+        for row = 1:1
             Ap(row, col) = 0;
         end
     end
+
+    for col = 1:W-3
+        for row = H:H
+            Ap(row, col) = 0;
+        end
+    end
+
 
     % the starting line
-    for col = 2:5
+    for col = 2:W-1
         for row = 1:1
             Ap(row, col) = 2;
         end
     end
 
     % the finishing line
-    for col = 11:14
-        for row = 1:1
+    for col = W-2:W-1
+        for row = H:H
             Ap(row, col) = 3;
         end
     end
    
 end
-

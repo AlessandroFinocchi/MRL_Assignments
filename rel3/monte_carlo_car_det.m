@@ -5,7 +5,7 @@ clc
 rng(42)
 
 % init track
-[track, H, W] = xxl_track();
+[track, H, W] = track_uturn_walled_15();
 speedCap = 5;
 
 numEpisodes = 1;            % number of episodes
@@ -142,32 +142,11 @@ while true
     policy = newpolicy;
     graph_policy(track, policy, W, H, speedCap, iteration_counter);
     % if policy doesn't change stop
-    % if sum(s) <= (S*A)*0.05 || (sum(sum(any(N==0, [S,A]))) / S*A) < 0.05
-    % if (sum(sum(any(N==0, [S,A]))) / (S*A)) < 0.05
-    if (sum(sum(any(N==0, [S,A]))) / (S*A)) < 0.10
+    if (sum(sum(any(N==0, [S,A]))) / (S*A)) < 0.50
         break;
     end
 
 end
-
-    
-
-%% print policy
-
-% for s=1:S
-% 
-%     a = policy(s);
-% 
-%     [a_row, a_col] = ind2sub([3,3], a);
-%     % traslate back acceleration
-%     a_col = a_col - 2;
-%     a_row = a_row -2;
-%     [row, col, v_row, v_col] = ind2sub([W, H, speedCap*2+1, speedCap*2+1], s);
-%     v_row = v_row - speedCap - 1;
-%     v_col = v_col - speedCap - 1;
-%     fprintf("s:(row: %d, col: %d v_row: %d v_col: %d) <-> a:(a_row: %d, a_col: %d)\n", row, col, v_row, v_col, a_row, a_col);
-% 
-% end
 
 %% graph policy
 iterative_graph_policy(track, policy, W, H, speedCap, iteration_counter);

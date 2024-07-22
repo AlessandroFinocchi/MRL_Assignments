@@ -5,7 +5,7 @@ clc
 rng(42)
 
 % init track
-[track, H, W] = empty_track_big6();
+[track, H, W] = track_single_curve_20();
 speedCap = 5;
 
 gamma = 1; % discount factor;
@@ -19,16 +19,12 @@ maxSteps = 10000;
 
 policy = randi(A,[S,1]); % policy
 
-Q = ones(S, A) .* -maxSteps; % quality function
+Q = zeros(S, A); % quality function
 alpha = 0.1;
-% N = zeros(S, A); % counter of visits
 
 iteration_counter = 0;
 
 while true
-
-    % Q = zeros(S, A); % quality function
-    % N = zeros(S, A); % counter of visits
     
     iteration_counter = iteration_counter + 1;
 
@@ -38,8 +34,6 @@ while true
     for j = 1:numEpisodes
         
         step_counter = 0;
-        % beginning of episode
-        % fprintf("Begin episode %d.%d -> ", iteration_counter, j);
         s0 = randi(S);
         a0 = randi(A);
         states = s0;
@@ -58,11 +52,6 @@ while true
             [row, col, v_row, v_col] = ind2sub([W, H, speedCap*2+1, speedCap*2+1], sp);
             v_row = v_row - speedCap - 1;
             v_col = v_col - speedCap - 1;
-
-            % if iteration_counter == 3 
-            %     fprintf("row %d, col %d v_row %d v_col %d a_row %d a_col %d\n", row, col, v_row, v_col, a_row, a_col);
-            %     pause(0.2);
-            % end
 
             [sp,r] = carWrapper(track, W, H, speedCap, s, a);
             step_counter = step_counter + 1;
@@ -139,6 +128,7 @@ while true
     % if policy doesn't change stop
     s = policy~=newpolicy;
     fprintf("Policy changed at iteration %d: %.3f\n", iteration_counter, sum(s));
+
     if sum(s) < length(policy) * 0.05
         break
     else
