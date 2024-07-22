@@ -5,7 +5,7 @@ clc
 rng(42)
 
 % init track
-[track, H, W] = empty_track_big6();
+[track, H, W] = xxl_track();
 speedCap = 5;
 
 numEpisodes = 1;            % number of episodes
@@ -14,6 +14,7 @@ maxNumEpisodes = 50;
 S = W*H*(speedCap*2+1)^2;   % total number of states;
 A = 3*3;                    % number of action
 
+% for stop too long episodes
 maxSteps = sqrt(S);
 
 policy = randi(A,[S,1]); % policy
@@ -33,12 +34,11 @@ while true
     j = 1;
 
     while j <= numEpisodes
-
+        explored_percentage = sum(sum(any(N==0, [S,A]))) / (S*A);
         unexploredStates = find(N(:,:) == 0);
-        if ~isempty(unexploredStates) && randi(1) < (sum(sum(any(N==0, [S,A]))) / (S*A))
-        % if ~isempty(unexploredStates) && randi(1) < (sum(sum(any(N==0, [S,A]))) / (S*A))^2
-        % if ~isempty(unexploredStates) && randi(1) < 0.9
-        % if ~isempty(unexploredStates) < 0.5
+        % take an unexplored state action with probabililty as the
+        % percentage of unexplored state action
+        if ~isempty(unexploredStates) && randi(1) < explored_percentage
             [s0, a0] = ind2sub([S,A], unexploredStates(randi(length(unexploredStates))));
         else
             s0 = randi(S);
@@ -58,7 +58,8 @@ while true
         skippedEpisode = false;
 
         while sp ~= -1
-
+            % check if state-action has been visited more than five times or if more than
+            % maxSteps steps has been made
             if (any(visitedQ == sub2ind([S,A], s, a))) || step_counter >= maxSteps
                 loopCounter = loopCounter + 1;
                 if loopCounter >= 5 || step_counter >= maxSteps
@@ -68,7 +69,7 @@ while true
             else
                 visitedQ = [visitedQ, sub2ind([S,A], s, a)];
             end
-
+            
             [sp,r] = carWrapper(track, H, W, speedCap, s, a);
             step_counter = step_counter + 1;
             rewards = [rewards, r];
@@ -89,9 +90,11 @@ while true
                 St = states(i);
                 At = actions(i);
                 stateActionIndex = sub2ind([S,A], St, At);
+                % if the state-action has not yet been visited then update
                 if ~any(already_visited == stateActionIndex)
                     already_visited = [already_visited, stateActionIndex];
                     G = 0;
+                    
                     for k = i+1:length(rewards)
                         G = G + rewards(k);
                     end
