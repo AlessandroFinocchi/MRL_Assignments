@@ -5,12 +5,12 @@ clc
 rng(42)
 
 % init track
-[track, H, W] = track_single_curve_20();
+[track, H, W] = track_hard_walled_15();
 speedCap = 5;
 
-gamma = 1; % discount factor;
-numEpisodes = 100; % number of episodes to mean
-epsilon = 0.5;
+gamma = 10; % discount factor;
+beginNumEpisodes = 1; % number of episodes to mean
+epsilon = 0.2;
 
 S = W*H*(speedCap*2+1)^2; % total number of states;
 A = 3*3; % number of action
@@ -24,14 +24,17 @@ alpha = 0.1;
 
 iteration_counter = 0;
 
-while true
-    
+beginTime = datetime('now');
+while seconds(datetime('now') - beginTime) < 60 * 10
+
+    fprintf("Seconds passed %d/600.\n", floor(seconds(datetime('now') - beginTime)))
     iteration_counter = iteration_counter + 1;
 
-    numEpisodes = min(1e4, numEpisodes * 1.10);
+    numEpisodes = min(1e4, max(floor(beginNumEpisodes * 1.10^iteration_counter), beginNumEpisodes + iteration_counter));
     skipped = 0;
 
-    for j = 1:numEpisodes
+    j = 1;
+    while j < numEpisodes
         
         step_counter = 0;
         s0 = randi(S);
@@ -70,7 +73,6 @@ while true
         end
 
         if step_counter < (maxSteps - 1)
-
             % First visit
             already_visited = [];
             for i = 1:length(actions)
@@ -98,18 +100,18 @@ while true
             % end
 
             if true || iteration_counter < 30
-                fprintf("Episode %d.%d -> ", iteration_counter, j);
+                fprintf("Episode %d.%d(%d) of %d -> ", iteration_counter, j, skipped, numEpisodes);
                 fprintf("took %d steps.\n", step_counter);
             end
+            j = j + 1;
         else
             if true || iteration_counter < 30
                 skipped = skipped + 1;
-                numEpisodes = numEpisodes + 1;
-                fprintf("Episode %d.%d -> ", iteration_counter, j);
-                fprintf("skipped.\n");
+                % numEpisodes = numEpisodes + 1;
+                % fprintf("Episode %d.%d(%d) of %d -> ", iteration_counter, j, skipped, numEpisodes);
+                % fprintf("skipped.\n");
             end
         end
-
     end
 
     newpolicy = zeros(S,1);
@@ -130,6 +132,7 @@ while true
     fprintf("Policy changed at iteration %d: %.3f\n", iteration_counter, sum(s));
 
     if sum(s) < length(policy) * 0.05
+        fprintf("Break due to policy changed too litle.\n")
         break
     else
         policy = newpolicy;
@@ -143,20 +146,20 @@ end
 
 %% print policy
 
-for s=1:S
-
-    a = policy(s);
-
-    [a_row, a_col] = ind2sub([3,3], a);
-    % traslate back acceleration
-    a_col = a_col - 2;
-    a_row = a_row -2;
-    [row, col, v_row, v_col] = ind2sub([W, H, speedCap*2+1, speedCap*2+1], s);
-    v_row = v_row - speedCap - 1;
-    v_col = v_col - speedCap - 1;
-    fprintf("s:(row: %d, col: %d v_row: %d v_col: %d) <-> a:(a_row: %d, a_col: %d)\n", row, col, v_row, v_col, a_row, a_col);
-
-end
+% for s=1:S
+% 
+%     a = policy(s);
+% 
+%     [a_row, a_col] = ind2sub([3,3], a);
+%     % traslate back acceleration
+%     a_col = a_col - 2;
+%     a_row = a_row -2;
+%     [row, col, v_row, v_col] = ind2sub([W, H, speedCap*2+1, speedCap*2+1], s);
+%     v_row = v_row - speedCap - 1;
+%     v_col = v_col - speedCap - 1;
+%     fprintf("s:(row: %d, col: %d v_row: %d v_col: %d) <-> a:(a_row: %d, a_col: %d)\n", row, col, v_row, v_col, a_row, a_col);
+% 
+% end
 
 %% graph policy
 graph_policy(track, policy, W, H, speedCap);

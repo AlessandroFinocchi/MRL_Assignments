@@ -5,7 +5,7 @@ clc
 rng(42)
 
 % init track
-[track, H, W] = track_uturn_walled_15();
+[track, H, W] = track_hard_walled_15();
 speedCap = 5;
 
 numEpisodes = 1;            % number of episodes
@@ -27,7 +27,8 @@ iteration_counter = 0;
 total_skipped_episodes = 0;
 total_valid_episodes = 0;
 
-while true
+beginTime = datetime('now');
+while seconds(datetime('now') - beginTime) < 60 * 10 -1 
 
     iteration_counter = iteration_counter + 1;
     skipped = 0;
@@ -132,21 +133,27 @@ while true
         "After %d+%d episodes.\n" + ...
         "After %d+%d total episodes.\n" + ...
         "Mean exploration of Q  : %.2f\n" + ...
-        "Unexplored entries of Q: %d/%d, approx %.2f%%\n\n", ...
+        "Unexplored entries of Q: %d/%d, approx %.2f%%\n" + ...
+        "Seconds passed: %d/600\n", ...
         iteration_counter, sum(s), ...
         numEpisodes, skipped, ...
         total_valid_episodes, total_skipped_episodes, ...
         mean(mean(N)), ...
-        sum(sum(any(N==0, [S,A]))), S*A, sum(sum(any(N==0, [S,A]))) / (S*A)*100);
+        sum(sum(any(N==0, [S,A]))), S*A, sum(sum(any(N==0, [S,A]))) / (S*A)*100, floor(seconds(datetime('now') - beginTime)));
 
     policy = newpolicy;
     graph_policy(track, policy, W, H, speedCap, iteration_counter);
     % if policy doesn't change stop
-    if (sum(sum(any(N==0, [S,A]))) / (S*A)) < 0.50
+    if (sum(sum(any(N==0, [S,A]))) / (S*A)) < 0.66
+        fprintf("Break due to policy.")
         break;
     end
 
 end
 
+%% save policy
+save det_hard_walled_15.mat track policy W H speedCap iteration_counter
+
 %% graph policy
-iterative_graph_policy(track, policy, W, H, speedCap, iteration_counter);
+load det_hard_walled_15.mat
+graph_policy(track, policy, W, H, speedCap, iteration_counter);
