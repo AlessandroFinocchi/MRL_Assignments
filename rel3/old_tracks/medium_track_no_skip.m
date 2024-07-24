@@ -1,4 +1,4 @@
-function [Ap, H, W] = medium_track()
+function [Ap, H, W] = medium_track_no_skip()
 
     H = 2 * 5;
     W = 2 * 5;
@@ -11,13 +11,7 @@ function [Ap, H, W] = medium_track()
         end
     end
 
-    for col = 7:7
-        for row = 10:10
-            Ap(row, col) = 0;
-        end
-    end
-
-    for col = 8:8
+    for col = 7:8
         for row = 3:10
             Ap(row, col) = 0;
         end
