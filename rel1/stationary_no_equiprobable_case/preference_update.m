@@ -51,15 +51,16 @@ figure('Position', [0 0 1280 720])
 hold on
 % Graph content
 title('H')
-plot(historyH', 'LineWidth', 1.5)
+plot(historyH', 'LineWidth', 3)
 lgn = legend('Rock', 'Paper', 'Scissors', 'Spock', 'Lizard');
+lgn.FontSize = 24;
 set(gca, 'ColorOrder', colors(5))
 % Fixed
 grid on
 lgn.Location = 'northeastoutside';
 hold off
 % Save graph
-saveas(gcf, "graphs/preference_update/Q", "png")
+saveas(gcf, "graphs/preference_update/H", "png")
 %--------------------------------------------------------------------------
 
 %-----------------plot the history of W------------------------------------
@@ -68,10 +69,11 @@ figure('Position', [0 0 1280 720])
 hold on
 % Graph content
 title('W')
-plot(historyW(1,:)', 'LineWidth', 1.5)
-plot(historyW(2,:)', 'LineWidth', 1.5, 'LineStyle','--')
-plot(historyW(3,:)', 'LineWidth', 1.5, 'LineStyle',':')
+plot(historyW(1,:)', 'LineWidth', 3)
+plot(historyW(2,:)', 'LineWidth', 3, 'LineStyle','--')
+plot(historyW(3,:)', 'LineWidth', 3, 'LineStyle',':')
 lgn = legend('Wins_{agent}', 'Wins_{bandit}', 'Draws');
+lgn.FontSize = 24;
 set(gca, 'ColorOrder', colors(3))
 % Fixed
 grid on
